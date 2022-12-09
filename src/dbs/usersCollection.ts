@@ -1,10 +1,17 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
+const ObjectId = Types.ObjectId;
 
 // 表名称
 const userCollectionName = 'users';
 
 // cdnFiles表字段Schema信息
 const userCollectionSchema = new Schema({
+  //   _id: {
+  //     type: String,
+  //     default: function () {
+  //       return new ObjectId().toString();
+  //     },
+  //   },
   account_id: {
     type: String,
     default: '',

@@ -97,6 +97,6 @@ export class UsersService {
     const user = await userCollection.findOne({
       _id: data.id,
     });
-    return user.toObject();
+    return (user && user.toObject()) || {};
   }
 }

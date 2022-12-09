@@ -1,10 +1,17 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
+const ObjectId = Types.ObjectId;
 
 // 表名称
 const versionCollectionName = 'versions';
 
 // cdnFiles表字段Schema信息
 const versionCollectionSchema = new Schema({
+  _id: {
+    type: String,
+    default: function () {
+      return new ObjectId().toString();
+    },
+  },
   version: {
     type: Number,
     default: 1,

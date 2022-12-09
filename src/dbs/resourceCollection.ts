@@ -1,10 +1,17 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
+const ObjectId = Types.ObjectId;
 
 // 表名称
 const resCollectionName = 'resources';
 
 // cdnFiles表字段Schema信息
 const resCollectionSchema = new Schema({
+  _id: {
+    type: String,
+    default: function () {
+      return new ObjectId().toString();
+    },
+  },
   // 资源名称
   name: {
     type: String,
