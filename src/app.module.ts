@@ -11,8 +11,9 @@ import { VersionsController } from './module/versions/versions.controller';
 
 import { LoginMiddleware } from './middleware/login';
 import { LogMiddleware } from './middleware/log';
+import { UploadModule } from './module/upload/upload.module';
 @Module({
-  imports: [VersionsModule, ResourcesModule, UsersModule],
+  imports: [VersionsModule, ResourcesModule, UsersModule, UploadModule],
   controllers: [AppController],
   providers: [AppService],
 })
@@ -26,6 +27,7 @@ export class AppModule implements NestModule {
     consumer
       .apply(LoginMiddleware)
       .exclude('/api/users/login')
+      .exclude('/api/upload/files')
       .forRoutes(ResourcesController, UsersController, VersionsController);
   }
 }
