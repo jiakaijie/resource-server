@@ -4,7 +4,6 @@ const ObjectId = Types.ObjectId;
 // 表名称
 const versionCollectionName = 'versions';
 
-// cdnFiles表字段Schema信息
 const versionCollectionSchema = new Schema({
   _id: {
     type: String,

@@ -18,7 +18,7 @@ export class LoginMiddleware {
       if (!isLogin) {
         throw new UserExceptiosn(
           'Authorization异常或者登录失效',
-          HttpStatus.FORBIDDEN,
+          HttpStatus.UNAUTHORIZED,
         );
       } else {
         next();

@@ -4,7 +4,6 @@ const ObjectId = Types.ObjectId;
 // 表名称
 const resCollectionName = 'resources';
 
-// cdnFiles表字段Schema信息
 const resCollectionSchema = new Schema({
   _id: {
     type: String,
@@ -55,7 +54,7 @@ const resCollectionSchema = new Schema({
   // 数据
   data: {
     type: Object,
-    default: '',
+    default: {},
   },
 });
 

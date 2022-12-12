@@ -4,7 +4,6 @@ const ObjectId = Types.ObjectId;
 // 表名称
 const userCollectionName = 'users';
 
-// cdnFiles表字段Schema信息
 const userCollectionSchema = new Schema({
   //   _id: {
   //     type: String,
