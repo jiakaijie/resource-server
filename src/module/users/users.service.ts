@@ -5,6 +5,7 @@ import { http } from '../../utils/http';
 import { LoginData, TicketRes } from './user.type';
 import { jwtSign, jwtVerify } from '../../utils/jwt';
 import { ticketConfig, userInfoConfig } from '../../../ignoreConfig';
+import TalOss = require('@xes/tal-oss');
 
 interface CreateData {
   name: string;
