@@ -8,8 +8,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('/list')
-  list() {
-    return this.usersService.list();
+  list(@Query() queryData) {
+    return this.usersService.list(queryData);
   }
 
   @Post('/login')
@@ -20,5 +20,10 @@ export class UsersController {
   @Get('/userInfo')
   userInfo(@Req() req) {
     return this.usersService.getUserInfoByModle(req);
+  }
+
+  @Post('/update')
+  updateUser(@Body() bodyData, @Req() req) {
+    return this.usersService.updateUser(bodyData, req);
   }
 }
