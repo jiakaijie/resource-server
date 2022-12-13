@@ -5,12 +5,12 @@ const ObjectId = Types.ObjectId;
 const versionCollectionName = 'versions';
 
 const versionCollectionSchema = new Schema({
-  _id: {
-    type: String,
-    default: function () {
-      return new ObjectId().toString();
-    },
-  },
+  // _id: {
+  //   type: String,
+  //   default: function () {
+  //     return new ObjectId().toString();
+  //   },
+  // },
   version: {
     type: Number,
     default: 1,

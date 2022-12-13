@@ -12,6 +12,11 @@ export class UsersController {
     return this.usersService.list(queryData);
   }
 
+  @Get('/allList')
+  allList() {
+    return this.usersService.allList();
+  }
+
   @Post('/login')
   login(@Body() bodayData: LoginData) {
     return this.usersService.getJwtTokenAndUserInfo(bodayData);

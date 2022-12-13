@@ -27,7 +27,6 @@ export class AppModule implements NestModule {
     consumer
       .apply(LoginMiddleware)
       .exclude('/api/users/login')
-      .exclude('/api/upload/files')
       .forRoutes(ResourcesController, UsersController, VersionsController);
   }
 }

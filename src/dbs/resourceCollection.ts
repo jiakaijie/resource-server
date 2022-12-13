@@ -5,12 +5,12 @@ const ObjectId = Types.ObjectId;
 const resCollectionName = 'resources';
 
 const resCollectionSchema = new Schema({
-  _id: {
-    type: String,
-    default: function () {
-      return new ObjectId().toString();
-    },
-  },
+  // _id: {
+  //   type: String,
+  //   default: function () {
+  //     return new ObjectId().toString();
+  //   },
+  // },
   // 资源名称
   name: {
     type: String,

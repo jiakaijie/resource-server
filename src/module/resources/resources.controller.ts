@@ -25,8 +25,8 @@ export class ResourcesController {
   }
 
   @Get('/list')
-  getResourcesList() {
-    return this.resourcesService.getResourcesList();
+  getResourcesList(@Query() queryData) {
+    return this.resourcesService.getResourcesList(queryData);
   }
 
   @Get('/detail')

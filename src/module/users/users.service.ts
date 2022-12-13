@@ -36,11 +36,33 @@ export class UsersService {
   }
 
   async list(queryData) {
-    const users = await userCollection.find(queryData);
+    let { page = 1, page_size = 10, name, email, workcode } = queryData;
+
+    page = +page;
+    page_size = +page_size;
+
+    const findData: any = {};
+
+    name && (findData.name = name);
+    email && (findData.email = email);
+    workcode && (findData.workcode = workcode);
+
+    const skipNum = (page - 1) * page_size;
+    const list = await userCollection
+      .find(findData)
+      .sort({ create_time: -1 })
+      .skip(skipNum)
+      .limit(page_size);
+
+    const total = await userCollection.find(queryData).count();
     return {
-      list: users,
-      total: 10,
+      list,
+      total,
     };
+  }
+
+  async allList() {
+    return await userCollection.find();
   }
 
   async getTicket(): Promise<TicketRes> {
