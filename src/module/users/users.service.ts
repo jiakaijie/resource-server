@@ -36,8 +36,12 @@ export class UsersService {
     return user.toObject();
   }
 
-  async list() {
-    return await userCollection.find();
+  async list(queryData) {
+    const users = await userCollection.find(queryData);
+    return {
+      list: users,
+      total: 10,
+    };
   }
 
   async getTicket(): Promise<TicketRes> {
@@ -99,5 +103,28 @@ export class UsersService {
       _id: data.id,
     });
     return (user && user.toObject()) || {};
+  }
+
+  async updateUser(bodayData, req) {
+    const user: any = await this.getUserInfoByModle(req);
+
+    // if (user.role === 0) {
+    //   return {
+    //     isSuccess: false,
+    //     msg: '超级管理员才能编辑角色',
+    //   };
+    // } else {
+      await userCollection.findOneAndUpdate(
+        {
+          _id: bodayData._id,
+        },
+        {
+          role: bodayData.role,
+        },
+      );
+      return {
+        isSuccess: true,
+      };
+    // }
   }
 }
