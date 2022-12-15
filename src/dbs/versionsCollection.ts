@@ -27,15 +27,7 @@ const versionCollectionSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  update_time: {
-    type: Date,
-    default: Date.now,
-  },
   create_user_id: {
-    type: String,
-    default: '',
-  },
-  update_user_id: {
     type: String,
     default: '',
   },

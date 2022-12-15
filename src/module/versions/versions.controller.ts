@@ -1,11 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Query } from '@nestjs/common';
 import { VersionsService } from './versions.service';
 
 @Controller('versions')
 export class VersionsController {
   constructor(private readonly versionsService: VersionsService) {}
 
-  @Get('/')
+  @Post('/create')
   create() {
     return this.versionsService.create({
       resource_id: '123',
@@ -18,8 +18,8 @@ export class VersionsController {
   }
 
   @Get('/list')
-  list() {
-    return this.versionsService.list();
+  list(@Query() queryData) {
+    return this.versionsService.list(queryData);
   }
 
   @Get('/a')

@@ -15,7 +15,12 @@ interface CreateData {
 @Injectable()
 export class UsersService {
   async modelFind(data) {
-    return await userCollection.find(data);
+    const list = await userCollection.find(data);
+    return list;
+  }
+
+  async modleFindOne(data) {
+    return await userCollection.findOne(data);
   }
 
   async modelInsert(data) {
