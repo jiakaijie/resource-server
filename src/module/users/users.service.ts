@@ -122,7 +122,6 @@ export class UsersService {
   }
 
   async getUserInfoByModle(req) {
-    // const Authorization = req.headers['authorization'];
     const Authorization = req.header('Authorization');
 
     const data: any = await jwtVerify(Authorization);
@@ -135,12 +134,12 @@ export class UsersService {
   async updateUser(bodayData, req) {
     const user: any = await this.getUserInfoByModle(req);
 
-    // if (user.role === 0) {
-    //   return {
-    //     isSuccess: false,
-    //     msg: '超级管理员才能编辑角色',
-    //   };
-    // } else {
+    if (user.role === 0) {
+      return {
+        isSuccess: false,
+        msg: '超级管理员才能编辑角色',
+      };
+    } else {
       await userCollection.findOneAndUpdate(
         {
           _id: bodayData._id,
@@ -152,6 +151,6 @@ export class UsersService {
       return {
         isSuccess: true,
       };
-    // }
+    }
   }
 }

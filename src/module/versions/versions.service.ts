@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { versionsCollections, userCollection, resCollection } from '../../dbs/index';
+import {
+  versionsCollections,
+  userCollection,
+  resCollection,
+} from '../../dbs/index';
 import { UsersService } from '../users/users.service';
 import { UploadService } from '../upload/upload.service';
+import { ResourcesService } from '../resources/resources.service';
+
 import { jwtVerify } from '../../utils/jwt';
+import versionCollection from 'src/dbs/versionsCollection';
 
 interface CreateData {
   resource_id: string;
@@ -16,6 +23,7 @@ export class VersionsService {
   constructor(
     private readonly userSerivice: UsersService,
     private readonly uploadService: UploadService,
+    private readonly resourcesService: ResourcesService,
   ) {}
   async modelFind(data) {
     return await versionsCollections.find(data).sort({
@@ -29,6 +37,8 @@ export class VersionsService {
 
   async create(bodyData: CreateData, req) {
     const { resource_id, data, desc } = bodyData;
+
+    await this.resourcesService.checkUser(resource_id, req);
 
     const Authorization = req.header('Authorization');
 
@@ -97,6 +107,63 @@ export class VersionsService {
       };
     } catch (err) {
       console.error(err);
+      return {
+        isSuccess: false,
+      };
+    }
+  }
+
+  async rollBack(bodyData, req) {
+    const { version_id } = bodyData;
+
+    try {
+      // 找将要上线版本
+      const publushVersion = await versionCollection.findOne({
+        _id: version_id,
+      });
+
+      await this.resourcesService.checkUser(publushVersion.resource_id, req);
+
+      // 将上线的版本切换为下线
+      await versionCollection.findOneAndUpdate(
+        {
+          resource_id: publushVersion.resource_id,
+          is_online_version: 1,
+        },
+        {
+          is_online_version: 0,
+        },
+      );
+
+      // 找资源并且更新版本号
+      const resource = await resCollection.findOneAndUpdate(
+        {
+          _id: publushVersion.resource_id,
+        },
+        {
+          version_id: publushVersion._id,
+        },
+      );
+
+      // 发布数据
+      const url = await this.uploadService.updateVersionData(
+        publushVersion.data,
+        resource.url,
+      );
+
+      await versionCollection.findOneAndUpdate(
+        {
+          _id: version_id,
+        },
+        {
+          is_online_version: 1,
+        },
+      );
+
+      return {
+        isSuccess: true,
+      };
+    } catch (error) {
       return {
         isSuccess: false,
       };

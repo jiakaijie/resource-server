@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
 import {
   resCollection,
   versionsCollections,
   userCollection,
 } from '../../dbs/index';
 import { jwtVerify } from '../../utils/jwt';
+import { UserExceptiosn } from '../../filters/user';
 
 interface CreateResourceData {
   resourceName: string;
@@ -20,6 +22,7 @@ interface UpdateResourceData extends CreateResourceData {
 
 @Injectable()
 export class ResourcesService {
+  constructor(private readonly usersService: UsersService) {}
   makeResourceParams(params: CreateResourceData) {
     const { resourceName, resourceDesc, data, userId } = params;
     return {
@@ -42,10 +45,23 @@ export class ResourcesService {
     return resCollection.insertMany(insertData);
   }
 
-  async updateResource(bodyData: UpdateResourceData, req): Promise<any> {
-    const Authorization = req.header('Authorization');
+  async checkUser(resource_id, req) {
+    const user: any = await this.usersService.getUserInfoByModle(req);
 
-    const data: any = await jwtVerify(Authorization);
+    const resource: any = await resCollection.findOne({
+      _id: resource_id,
+    });
+
+    // 超级管理员工或者自己的资源可以操作
+    if (!(user.role === 1 || resource.create_user_id === user._id.toString())) {
+      throw new UserExceptiosn('无权限', HttpStatus.FORBIDDEN);
+    } else {
+      return user;
+    }
+  }
+
+  async updateResource(bodyData: UpdateResourceData, req): Promise<any> {
+    const data: any = await this.checkUser(bodyData._id, req);
 
     const res = await resCollection.findByIdAndUpdate(
       {
@@ -56,7 +72,7 @@ export class ResourcesService {
         desc: bodyData.resourceDesc,
         data: bodyData.data,
         update_time: Date.now(),
-        update_user_id: data.id,
+        update_user_id: data._id,
       },
     );
 

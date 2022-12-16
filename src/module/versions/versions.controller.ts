@@ -15,6 +15,11 @@ export class VersionsController {
     return this.versionsService.list(queryData);
   }
 
+  @Post('/rollback')
+  rollBack(@Body() bodyData, @Req() req) {
+    return this.versionsService.rollBack(bodyData, req);
+  }
+
   @Get('/a')
   a() {
     console.log('/a');

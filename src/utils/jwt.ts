@@ -17,6 +17,7 @@ export const jwtSign = (signData: SignData): Promise<string> => {
       jwtKey,
       {
         expiresIn: '12h',
+        // expiresIn: '60s',
       },
       (_, token: string) => {
         resolve(token);
