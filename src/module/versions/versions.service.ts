@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { versionsCollections } from '../../dbs/index';
+import { versionsCollections, userCollection, resCollection } from '../../dbs/index';
 import { UsersService } from '../users/users.service';
-import { userCollection } from '../../dbs/index';
+import { UploadService } from '../upload/upload.service';
+import { jwtVerify } from '../../utils/jwt';
 
 interface CreateData {
   resource_id: string;
@@ -12,10 +13,13 @@ interface CreateData {
 
 @Injectable()
 export class VersionsService {
-  constructor(private readonly userSerivice: UsersService) {}
+  constructor(
+    private readonly userSerivice: UsersService,
+    private readonly uploadService: UploadService,
+  ) {}
   async modelFind(data) {
     return await versionsCollections.find(data).sort({
-      version: -1,
+      num: -1,
     });
   }
 
@@ -23,25 +27,80 @@ export class VersionsService {
     return await versionsCollections.insertMany(data);
   }
 
-  async create(data: CreateData) {
-    const { resource_id } = data;
+  async create(bodyData: CreateData, req) {
+    const { resource_id, data, desc } = bodyData;
 
-    const oldList = await this.modelFind({
-      resource_id,
-    });
+    const Authorization = req.header('Authorization');
 
-    const inserData = {
-      ...data,
-      version: 1,
-    };
+    const jwtData: any = await jwtVerify(Authorization);
 
-    if (oldList && oldList.length) {
-      inserData.version = oldList[0].version + 1;
+    try {
+      const resourceObj = await resCollection.findOne({
+        _id: resource_id,
+      });
+
+      let url = resourceObj.url;
+
+      let insertData: any = {};
+
+      if (!resourceObj.version_id) {
+        url = await this.uploadService.uploadVersionData(data);
+
+        insertData = {
+          num: 1,
+          resource_id,
+          desc,
+          create_user_id: jwtData.id,
+          is_online_version: 1,
+          data,
+        };
+      } else {
+        url = await this.uploadService.updateVersionData(data, url);
+        const oldList = await this.modelFind({
+          resource_id,
+        });
+
+        insertData = {
+          num: oldList[0].num + 1,
+          resource_id,
+          create_user_id: jwtData.id,
+          is_online_version: 1,
+          desc,
+          data,
+        };
+
+        await versionsCollections.findOneAndUpdate(
+          {
+            resource_id,
+            is_online_version: 1,
+          },
+          {
+            is_online_version: 0,
+          },
+        );
+      }
+
+      const newVersionList = await this.modelInsert(insertData);
+
+      const aaa = await resCollection.findOneAndUpdate(
+        {
+          _id: resource_id,
+        },
+        {
+          url,
+          version_id: newVersionList[0]._id,
+        },
+      );
+
+      return {
+        isSuccess: true,
+      };
+    } catch (err) {
+      console.error(err);
+      return {
+        isSuccess: false,
+      };
     }
-
-    const res = await versionsCollections.insertMany(inserData);
-
-    return res;
   }
 
   async list(queryData) {

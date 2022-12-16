@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { VersionsService } from './versions.service';
 
 @Controller('versions')
@@ -6,15 +6,8 @@ export class VersionsController {
   constructor(private readonly versionsService: VersionsService) {}
 
   @Post('/create')
-  create() {
-    return this.versionsService.create({
-      resource_id: '123',
-      create_user_id: '111',
-      data: {
-        a: 1,
-        b: 'sjdiajsdjaisdjiasjij',
-      },
-    });
+  create(@Body() bodyData, @Req() req) {
+    return this.versionsService.create(bodyData, req);
   }
 
   @Get('/list')

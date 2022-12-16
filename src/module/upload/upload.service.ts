@@ -45,6 +45,50 @@ export class UploadService {
       });
     });
   }
+
+  async uploadVersionData(data: any): Promise<string> {
+    const defaultDir = resolve(tmpdir(), uuid.v1());
+    const time = getYYYYMMDDHH(new Date());
+    const filePath = resolve(defaultDir, uuid.v4().slice(0, 8) + '.json');
+
+    fs.ensureFileSync(filePath);
+    fs.writeJsonSync(filePath, data);
+    return new Promise(async (resolve, resject) => {
+      try {
+        const { url, type } = await talOssOne({
+          filePath,
+          uploadTo: time,
+        });
+        fs.emptyDirSync(defaultDir);
+        resolve(url);
+      } catch (error) {
+        resject('');
+      }
+    });
+  }
+
+  async updateVersionData(data: any, oldUrl): Promise<string> {
+    const urlList = oldUrl.split('/');
+    const urlLength = urlList.length;
+    const time = urlList[urlLength - 2];
+    const defaultDir = resolve(tmpdir(), uuid.v1());
+
+    const filePath = resolve(defaultDir, urlList[urlLength - 1]);
+
+    fs.ensureFileSync(filePath);
+    fs.writeJsonSync(filePath, data);
+    return new Promise(async (resolve, resject) => {
+      try {
+        const { url, type } = await talOssOne({
+          filePath,
+          uploadTo: time,
+        });
+        resolve(url);
+      } catch (error) {
+        resject('');
+      }
+    });
+  }
   async uploadFiles(files) {
     return await this.getCdnUrl(files);
   }

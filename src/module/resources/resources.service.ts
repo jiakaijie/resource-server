@@ -85,16 +85,24 @@ export class ResourcesService {
 
     let resourceList = [];
 
-    resourceList = await resCollection
-      .find(findData)
-      .sort({ create_time: -1 })
-      .skip(skipNum)
-      .limit(page_size);
+    try {
+      resourceList = await resCollection
+        .find(findData)
+        .sort({ create_time: -1 })
+        .skip(skipNum)
+        .limit(page_size);
+    } catch (error) {
+      resourceList = [];
+    }
 
     // console.log("findData-+++++++++++", findData);
     // console.log('resourceList----------', resourceList);
-
-    const total = await resCollection.find(findData).count();
+    let total = 0;
+    try {
+      total = await resCollection.find(findData).count();
+    } catch (error) {
+      total = 0;
+    }
 
     const res = [];
     for (let i = 0; i < resourceList.length; i++) {
@@ -130,12 +138,12 @@ export class ResourcesService {
       }
 
       const currentItem = {
-        version: -1,
+        num: -1,
         create_user: '-',
         update_user: '-',
       };
       if (versionObj) {
-        currentItem.version = versionObj.toObject().version;
+        currentItem.num = versionObj.toObject().num;
       }
       if (createUserObj) {
         const currentobj = createUserObj.toObject();
@@ -160,5 +168,61 @@ export class ResourcesService {
     return await resCollection.findOne({
       _id: query._id,
     });
+  }
+
+  async getVersionDetail(query) {
+    const { resource_id } = query;
+
+    let resData = {
+      currentVersion: {
+        num: null,
+        desc: null,
+      },
+      highVersion: {
+        num: null,
+        desc: null,
+      },
+    };
+
+    try {
+      const resourceObj = await resCollection.findOne({
+        _id: resource_id,
+      });
+
+      if (!resourceObj.version_id) {
+        return resData;
+      }
+
+      const curtVersion = await versionsCollections.findOne({
+        _id: resourceObj.version_id,
+      });
+
+      const versionList = await versionsCollections
+        .find({
+          resource_id,
+        })
+        .sort({ num: -1 });
+
+      let highVersion: any = {};
+      if (versionList && versionList.length) {
+        highVersion = versionList[0];
+      } else {
+        highVersion = {};
+      }
+
+      resData = {
+        currentVersion: {
+          num: curtVersion.num,
+          desc: curtVersion.desc,
+        },
+        highVersion: {
+          num: highVersion.num,
+          desc: highVersion.desc,
+        },
+      };
+    } catch (err) {
+      console.log(err);
+    }
+    return resData;
   }
 }

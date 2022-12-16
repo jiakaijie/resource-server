@@ -11,7 +11,7 @@ const versionCollectionSchema = new Schema({
   //     return new ObjectId().toString();
   //   },
   // },
-  version: {
+  num: {
     type: Number,
     default: 1,
   },
@@ -31,7 +31,7 @@ const versionCollectionSchema = new Schema({
     type: String,
     default: '',
   },
-  version_desc: {
+  desc: {
     type: String,
     default: '',
   },

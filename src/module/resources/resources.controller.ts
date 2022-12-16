@@ -33,4 +33,9 @@ export class ResourcesController {
   getResourceDetail(@Query() query) {
     return this.resourcesService.getResourceDetail(query);
   }
+
+  @Get('/versionDetail')
+  getVersionDetail(@Query() query) {
+    return this.resourcesService.getVersionDetail(query);
+  }
 }
