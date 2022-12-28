@@ -6,7 +6,13 @@ import { startDb } from './dbs/index';
 import { TransformInterceptor } from './interceptor/transform.interceptor';
 import { LoggingInterceptor } from './interceptor/aa';
 
+// import { config, env } from './config/index';
+import { env, getConfig } from './config1/index';
 async function bootstrap() {
+  const config = (await getConfig()).default;
+  console.log('config', config);
+  console.log('bootstrap-----', env);
+  // console.log("++++++++++++++++++++", config, env);
   startDb();
   const app = await NestFactory.create(AppModule, {
     cors: {
